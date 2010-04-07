@@ -7,66 +7,22 @@
 
 require 'net/http'
 
-class TwitterHole
-  VERSION = '0.1.0'
-  
-  # TWITTER = 'www.baidu.com'
-  TWITTER = '168.143.161.20'
-  
-  REQUEST_HEADERS = %w[ ACCEPT
-                        ACCEPT_LANGUAGE
-                        ACCEPT_ENCODING
-                        ACCEPT_CHARSET
-                        CACHE_CONTROL
-                        CONTENT_LENGTH
-                        CONTENT_TYPE
-                        CONNECTION
-                        COOKIE
-                        HOST
-                        IF_NONE_MATCH
-                        KEEP_ALIVE
-                        PROXY_CONNECTION
-                        REFERER
-                        USER_AGENT ].freeze
-  
-  def initialize(env)
-    @env = env
-  end
-  
-  def env
-    @env
-  end
-  
-  def method
-    env['REQUEST_METHOD'].downcase
-  end
-  
-  def uri
-    env['REQUEST_URI']
-  end
-  
-  def data
-    env['rack.input'].read
-  end
-  
-  def headers
-    # Hash[ @env.select { |k,v| REQUEST_HEADERS.include?(k.gsub(/^HTTP_/, '')) }.map { |pair| [ pair.first.gsub(/^HTTP_/, ''), pair.last ] } ]
-    h = {}
-    env.each { |k,v| h[k] = v if k =~ /^HTTP_/ && k !~ /HEROKU/ && v }
-    h
-  end
+VERSION = '0.1.0'
 
-  def get
-    Net::HTTP.start(TWITTER) { |http| http.get(uri, headers) }
-  end
-  
-  def post
-    Net::HTTP.start(TWITTER) { |http| http.post(uri, data, headers) }
-  end
-  
-  def result
-    result = send(method)
+TWITTER = '168.143.161.20'
+
+class TwitterHole
+  def initialize(env)
+    headers = {}
+    env.each { |k,v| headers[k] = v if k =~ /^HTTP_/ && k !~ /HEROKU/ && v }
+    
+    result = case env['REQUEST_METHOD'].downcase
+    when 'get' then Net::HTTP.start(TWITTER) { |http| http.get(env['REQUEST_URI'], headers) }
+    when 'post' then Net::HTTP.start(TWITTER) { |http| http.post(env['REQUEST_URI'], env['rack.input'].read, headers) }
+    end
+    
     [ result.code, result, result.body ]
+    
   rescue => ex
     [ 500, { 'Content-Type' => 'text/html' }, [ [ex.class.name, ex.message, ex.backtrace].join('<br><br>') ] ]
   end
