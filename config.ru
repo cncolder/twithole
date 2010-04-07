@@ -10,8 +10,8 @@ require 'net/http'
 class TwitterHole
   VERSION = '0.1.0'
   
-  # TWITTER = 'http://twitter.com/'
-  TWITTER = '168.143.161.20'
+  TWITTER = 'www.baidu.com'
+  # TWITTER = '168.143.161.20'
   
   REQUEST_HEADERS = %w[ ACCEPT
                         ACCEPT_LANGUAGE
@@ -31,11 +31,14 @@ class TwitterHole
   
   def initialize(env)
     @env = env
-    @uri = URI(@env['REQUEST_URI'])
   end
   
   def method
     @env['REQUEST_METHOD'].downcase
+  end
+  
+  def uri
+    @env['REQUEST_URI']
   end
   
   def data
@@ -48,18 +51,18 @@ class TwitterHole
   end
 
   def get
-    Net::HTTP.start(TWITTER) { |http| http.get(@uri, headers) }
+    Net::HTTP.start(TWITTER) { |http| http.get(uri, headers) }
   end
   
   def post
-    Net::HTTP.start(TWITTER) { |http| http.post(@uri, data, headers) }
+    Net::HTTP.start(TWITTER) { |http| http.post(uri, data, headers) }
   end
   
   def result
     result = send(method)
     [ result.code, result, result.body ]
   rescue => ex
-    [ 500, { 'Content-Type' => 'text/html' }, [ [ex.type, ex.message, ex.backtrace].join('<br>') ] ]
+    [ 500, { 'Content-Type' => 'text/html' }, [ [ex.class, ex.message, ex.backtrace].join('<br>') ] ]
   end
 end
 
