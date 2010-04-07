@@ -9,7 +9,8 @@ require 'net/http'
 
 VERSION = '0.1.0'
 
-TWITTER = '168.143.161.20'
+# TWITTER = '168.143.161.20'
+TWITTER = '61.135.163.94'
 
 class TwitterHole
   def initialize(env)
