@@ -51,7 +51,7 @@ class TwitterHole
   end
 
   def get
-    Net::HTTP.start(TWITTER) { |http| http.get(uri, headers) }
+    Net::HTTP.start(TWITTER) { |http| http.get(uri) }
   end
   
   def post
