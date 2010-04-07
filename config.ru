@@ -11,7 +11,7 @@ class TwitterHole
   VERSION = '0.1.0'
   
   # TWITTER = 'http://twitter.com/'
-  TWITTER = '59.24.3.173'
+  TWITTER = '168.143.161.20'
   
   REQUEST_HEADERS = %w[ ACCEPT
                         ACCEPT_LANGUAGE
