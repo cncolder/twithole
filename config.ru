@@ -51,7 +51,9 @@ class TwitterHole
   
   def headers
     # Hash[ @env.select { |k,v| REQUEST_HEADERS.include?(k.gsub(/^HTTP_/, '')) }.map { |pair| [ pair.first.gsub(/^HTTP_/, ''), pair.last ] } ]
-    Hash[ env.select { |k,v| k =~ /^HTTP_/ && k !~ /HEROKU/ }.select { |a| a.size == 2 } ]
+    h = {}
+    env.each { |k,v| h[k] = v if k =~ /^HTTP_/ && k !~ /HEROKU/ && v }
+    h
   end
 
   def get
@@ -83,5 +85,5 @@ map '/log' do
 end
 
 map '/test' do
-  run lambda { |env| [ 200, { 'Content-Type' => 'text/html' }, [ Hash[ env.select { |k,v| k =~ /^HTTP_/ && k !~ /HEROKU/ && v }.map ].inspect ] ] }
+  run lambda { |env| [ 200, { 'Content-Type' => 'text/html' }, [ env.select { |k,v| k =~ /^HTTP_/ && k !~ /HEROKU/ && v }.inspect ] ] }
 end
