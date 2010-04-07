@@ -83,5 +83,5 @@ map '/log' do
 end
 
 map '/test' do
-  run lambda { |env| [ 200, { 'Content-Type' => 'text/html' }, [ env.select { |k,v| k =~ /^HTTP_/ && k !~ /HEROKU/ && v }.inspect ] ] }
+  run lambda { |env| [ 200, { 'Content-Type' => 'text/html' }, [ Hash[ env.select { |k,v| k =~ /^HTTP_/ && k !~ /HEROKU/ && v } ].inspect ] ] }
 end
