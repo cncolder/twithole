@@ -62,7 +62,7 @@ class TwitterHole
     result = send(method)
     [ result.code, result, result.body ]
   rescue => ex
-    [ 500, { 'Content-Type' => 'text/html' }, [ [ex.class.name, ex.message, ex.backtrace].join('<br>') ] ]
+    [ 500, { 'Content-Type' => 'text/html' }, [ [ex.class.name, ex.message, ex.backtrace].join('<br><br>') ] ]
   end
 end
 
@@ -79,5 +79,5 @@ map '/log' do
 end
 
 map '/test' do
-  run lambda { |env| [ 200, { 'Content-Type' => 'text/html' }, [ Hash[env.select { |k,v| k =~ /^HTTP_/ and k !~ /HEROKU/ }].class.name ] ] }
+  run lambda { |env| [ 200, { 'Content-Type' => 'text/html' }, [ @env.select { |k,v| k =~ /^HTTP_/ && k !~ /HEROKU/ }.select { |a| a.size == 2 }.inspect ] ] }
 end
