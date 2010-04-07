@@ -10,7 +10,8 @@ require 'net/http'
 class TwitterHole
   VERSION = '0.1.0'
   
-  TWITTER = "http://twitter.com/"
+  # TWITTER = 'http://twitter.com/'
+  TWITTER = '59.24.3.173'
   
   REQUEST_HEADERS = %w[ ACCEPT
                         ACCEPT_LANGUAGE
