@@ -15,10 +15,9 @@ map '/' do
   run lambda { |env|
     case env['REQUEST_METHOD'].downcase
     when 'get'
-      result = Net::HTTP.get(URI(TWITTER + env['REQUEST_URI']))
-      [ result.code, result, result.body ]
+      Net::HTTP.get(URI(TWITTER + env['REQUEST_URI']))
     when 'post'
-      Net::HTTP.start(TWITTER) { |http| http.post(env['REQUEST_URI'], env['rack.input'].read, headers) }
+      Net::HTTP.start(TWITTER) { |http| http.post(env['REQUEST_URI'], env['rack.input'].read) }
     end
   }
 end
@@ -29,8 +28,4 @@ end
 
 map '/log' do
   run lambda { |env| [ 200, { 'Content-Type' => 'text/html' }, [ 'Thinking...' ] ] }
-end
-
-map '/test' do
-  run lambda { |env| [ 200, { 'Content-Type' => 'text/html' }, [ Net::HTTP.get(URI('http://twitter.com')) ] ] }
 end
