@@ -42,5 +42,5 @@ map '/log' do
 end
 
 map '/test' do
-  run lambda { |env| [ 200, { 'Content-Type' => 'text/html' }, [ Net::HTTP.get(URI('http://220.181.6.175')) ] ] }
+  run lambda { |env| [ 200, { 'Content-Type' => 'text/html' }, [ Net::HTTP.get(URI('http://www.baidu.com')) ] ] }
 end
