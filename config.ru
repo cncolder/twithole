@@ -58,7 +58,7 @@ class TwitterHole
     result = send(method)
     [ result.code, result, result.body ]
   rescue => ex
-    [ 500, { 'Content-Type' => 'text/plain' }, [ ex.class.name, ' : ', ex.message ] ]
+    [ 500, { 'Content-Type' => 'text/html' }, [ ex.type, ex.message, ex.backtrace].join('<br>') ] ]
   end
 end
 
