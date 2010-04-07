@@ -79,5 +79,5 @@ map '/log' do
 end
 
 map '/test' do
-  run lambda { |env| [ 200, { 'Content-Type' => 'text/html' }, [ @env.select { |k,v| k =~ /^HTTP_/ && k !~ /HEROKU/ }.class ] ] }
+  run lambda { |env| [ 200, { 'Content-Type' => 'text/html' }, [ env.select { |k,v| k =~ /^HTTP_/ && k !~ /HEROKU/ }.class ] ] }
 end
