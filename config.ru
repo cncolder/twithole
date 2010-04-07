@@ -18,7 +18,7 @@ class TwitterHole
     env.each { |k,v| headers[k] = v if k =~ /^HTTP_/ and k !~ /HEROKU/ and v }
     
     result = case env['REQUEST_METHOD'].downcase
-    when 'get' then Net::HTTP.get(URI(TWITTER + env['REQUEST_URI']), headers)
+    when 'get' then Net::HTTP.get(URI(TWITTER + env['REQUEST_URI']))
     when 'post' then Net::HTTP.start(TWITTER) { |http| http.post(env['REQUEST_URI'], env['rack.input'].read, headers) }
     end
     
