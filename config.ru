@@ -9,16 +9,17 @@ require 'net/http'
 
 VERSION = '0.1.0'
 
-# TWITTER = '168.143.161.20'
 TWITTER = 'http://twitter.com'
 
 map '/' do
   run lambda { |env|
-    [ 200, { 'Content-Type' => 'text/html' },
     case env['REQUEST_METHOD'].downcase
-    when 'get' then Net::HTTP.get(URI(TWITTER + env['REQUEST_URI']))
-    when 'post' then Net::HTTP.start(TWITTER) { |http| http.post(env['REQUEST_URI'], env['rack.input'].read, headers) }
-    end ]
+    when 'get'
+      result = Net::HTTP.get(URI(TWITTER + env['REQUEST_URI']))
+      [ result.code, result, result.body ]
+    when 'post'
+      Net::HTTP.start(TWITTER) { |http| http.post(env['REQUEST_URI'], env['rack.input'].read, headers) }
+    end
   }
 end
 
