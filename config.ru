@@ -31,5 +31,5 @@ map '/log' do
 end
 
 map '/test/' do
-  run lambda { |env| Net::HTTP.get(TWITTER) }
+  run lambda { |env| Net::HTTP.start(TWITTER.host) { |h| [ h.code.to_i, h.each_header { |k,v| { k => v } }, [ h.body ] ] } }
 end
