@@ -12,25 +12,14 @@ VERSION = '0.1.0'
 # TWITTER = '168.143.161.20'
 TWITTER = 'http://twitter.com'
 
-class TwitterHole
-  def initialize(env)
-    # headers = {}
-    # env.each { |k,v| headers[k] = v if k =~ /^HTTP_/ and k !~ /HEROKU/ and v }
-    
-    result = case env['REQUEST_METHOD'].downcase
+map '/' do
+  run lambda { |env|
+    [ 200, { 'Content-Type' => 'text/html' },
+    case env['REQUEST_METHOD'].downcase
     when 'get' then Net::HTTP.get(URI(TWITTER + env['REQUEST_URI']))
     when 'post' then Net::HTTP.start(TWITTER) { |http| http.post(env['REQUEST_URI'], env['rack.input'].read, headers) }
-    end
-    
-    [ 200, { 'Content-Type' => 'text/html' }, [ result ] ]
-    
-  rescue => ex
-    [ 500, { 'Content-Type' => 'text/html' }, [ [ex.class.name, ex.message, ex.backtrace].join('<br><br>') ] ]
-  end
-end
-
-map '/' do
-  run lambda { |env| TwitterHole.new(env).result }
+    end ]
+  }
 end
 
 map '/env' do
