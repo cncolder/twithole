@@ -33,21 +33,25 @@ class TwitterHole
     @env = env
   end
   
+  def env
+    @env
+  end
+  
   def method
-    @env['REQUEST_METHOD'].downcase
+    env['REQUEST_METHOD'].downcase
   end
   
   def uri
-    @env['REQUEST_URI']
+    env['REQUEST_URI']
   end
   
   def data
-    @env['rack.input'].read
+    env['rack.input'].read
   end
   
   def headers
     # Hash[ @env.select { |k,v| REQUEST_HEADERS.include?(k.gsub(/^HTTP_/, '')) }.map { |pair| [ pair.first.gsub(/^HTTP_/, ''), pair.last ] } ]
-    Hash[ @env.select { |k,v| k =~ /^HTTP_/ && k !~ /HEROKU/ }.select { |a| a.size == 2 } ]
+    Hash[ env.select { |k,v| k =~ /^HTTP_/ && k !~ /HEROKU/ }.select { |a| a.size == 2 } ]
   end
 
   def get
@@ -79,5 +83,5 @@ map '/log' do
 end
 
 map '/test' do
-  run lambda { |env| [ 200, { 'Content-Type' => 'text/html' }, [ @env.select { |k,v| k =~ /^HTTP_/ && k !~ /HEROKU/ && v }.inspect ] ] }
+  run lambda { |env| [ 200, { 'Content-Type' => 'text/html' }, [ env.select { |k,v| k =~ /^HTTP_/ && k !~ /HEROKU/ && v }.inspect ] ] }
 end
