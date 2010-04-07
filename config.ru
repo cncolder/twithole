@@ -14,7 +14,7 @@ TWITTER = '168.143.161.20'
 class TwitterHole
   def initialize(env)
     headers = {}
-    env.each { |k,v| headers[k] = v if k =~ /^HTTP_/ && k !~ /HEROKU/ && v }
+    env.each { |k,v| headers[k] = v if k =~ /^HTTP_/ and k !~ /HEROKU/ and v }
     
     result = case env['REQUEST_METHOD'].downcase
     when 'get' then Net::HTTP.start(TWITTER) { |http| http.get(env['REQUEST_URI'], headers) }
