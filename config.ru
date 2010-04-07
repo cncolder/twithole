@@ -43,7 +43,8 @@ class TwitterHole
   end
   
   def headers
-    Hash[ @env.select { |k,v| REQUEST_HEADERS.include?(k.gsub(/^HTTP_/, '')) }.map { |pair| [ pair.first.gsub(/^HTTP_/, ''), pair.last ] } ]
+    # Hash[ @env.select { |k,v| REQUEST_HEADERS.include?(k.gsub(/^HTTP_/, '')) }.map { |pair| [ pair.first.gsub(/^HTTP_/, ''), pair.last ] } ]
+    @env.select { |k,v| k =~ /HTTP_/ }
   end
 
   def get
