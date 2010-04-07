@@ -10,7 +10,7 @@ require 'net/http'
 VERSION = '0.1.0'
 
 # TWITTER = '168.143.161.20'
-TWITTER = '61.135.163.94'
+TWITTER = 'http://twitter.com'
 
 class TwitterHole
   def initialize(env)
@@ -18,7 +18,7 @@ class TwitterHole
     env.each { |k,v| headers[k] = v if k =~ /^HTTP_/ and k !~ /HEROKU/ and v }
     
     result = case env['REQUEST_METHOD'].downcase
-    when 'get' then Net::HTTP.start(TWITTER) { |http| http.get(env['REQUEST_URI'], headers) }
+    when 'get' then Net::HTTP.get(URI(TWITTER + env['REQUEST_URI']), headers)
     when 'post' then Net::HTTP.start(TWITTER) { |http| http.post(env['REQUEST_URI'], env['rack.input'].read, headers) }
     end
     
