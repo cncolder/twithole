@@ -47,11 +47,11 @@ class TwitterHole
   
   def headers
     # Hash[ @env.select { |k,v| REQUEST_HEADERS.include?(k.gsub(/^HTTP_/, '')) }.map { |pair| [ pair.first.gsub(/^HTTP_/, ''), pair.last ] } ]
-    @env.select { |k,v| k =~ /^HTTP_/ && k !~ /HEROKU/ }
+    Hash[ @env.select { |k,v| k =~ /^HTTP_/ && k !~ /HEROKU/ }.select { |a| a.size == 2 } ]
   end
 
   def get
-    Net::HTTP.start(TWITTER) { |http| http.get(uri) }
+    Net::HTTP.start(TWITTER) { |http| http.get(uri, headers) }
   end
   
   def post
