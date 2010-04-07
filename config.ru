@@ -22,7 +22,7 @@ class TwitterHole
     when 'post' then Net::HTTP.start(TWITTER) { |http| http.post(env['REQUEST_URI'], env['rack.input'].read, headers) }
     end
     
-    [ result.code, result, result.body ]
+    [ 200, { 'Content-Type' => 'text/html' }, result ]
     
   rescue => ex
     [ 500, { 'Content-Type' => 'text/html' }, [ [ex.class.name, ex.message, ex.backtrace].join('<br><br>') ] ]
