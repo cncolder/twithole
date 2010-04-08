@@ -42,7 +42,7 @@ class TwitHole
  
     # Send request then wait response from twitter.
     twitter_response = Net::HTTP.start(twitter_uri.host, twitter_uri.port) do |http|
-      http.request(req)
+      http.request(twitter_request)
     end
     
     # Get twitter response headers. Maybe the best idea is filter it and make it simple.
@@ -62,7 +62,7 @@ class TwitHole
     }
     
     # Return result to u.
-    [ twitter_response.code.to_i, headers, [ twitter_response.read_body.gsub(twitter_uri.host, user_request.host) ] ]
+    [ twitter_response.code.to_i, twitter_headers, [ twitter_response.read_body.gsub(twitter_uri.host, user_request.host) ] ]
   end
 end
 
