@@ -9,8 +9,7 @@ class TwitHole
  
   def call(env)
     @req = Rack::Request.new(env)
-    method = @req.request_method.downcase
-    method[0..0] = method[0..0].upcase
+    method = @req.request_method.capitalize
     
     uri = URI('http://twitter.com').merge(@req.fullpath)
     req = Net::HTTP.const_get(method).new(uri.to_s)
@@ -22,7 +21,12 @@ class TwitHole
     end
     
     req['X-Forwarded-For'] = (@req['HTTP_X_FORWARDED_FOR'].to_s.split(/, +/) + [@req['REMOTE_ADDR']]).uniq.join(", ")
-    %w{Accept-Encoding Authorization Referer User-Agent X-Twitter-Client X-Twitter-Client-URL X-Twitter-Client-Version}.each { |h| req[h] = @req["HTTP_#{h.gsub('-', '_').upcase}"] }
+    @req.each do |k,v| 
+      if k =~ /^HTTP_/
+        key = k.gsub(/^HTTP_/, '').split('_').map(&capitalize).join('-')
+        req[key] = v
+      end
+    end
  
     res = Net::HTTP.start(uri.host, uri.port) do |http|
       http.request(req)
