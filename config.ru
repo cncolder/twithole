@@ -92,7 +92,7 @@ map '/admin/log' do
   run lambda { |env|
     res = %{
 <table border=1>
-  <tr><th>Time</th><th>IP</th><th>Method</th><th>Url</th><th>Result</th></tr>
+  <tr><th>Time</th><th>Method</th><th>Url</th><th>Result</th></tr>
 	#{TwitHole.log.map {|l| "<tr><td>#{l[:time]}</td><td>#{l[:method]}</td><td>#{l[:url]}</td><td>#{l[:result]}</td></tr>"}}
 </table>}
     [ 200, { 'Content-Type' => 'text/html' }, [ res ] ]
