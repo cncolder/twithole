@@ -5,7 +5,7 @@
 #++
 #############################################################################
 
-require 'net/http'
+require 'rack/proxy'
 
 class TwitHole < Rack::Proxy
   def initialize(app)
