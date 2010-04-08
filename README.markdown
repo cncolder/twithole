@@ -11,10 +11,12 @@ So I deside try this way by heroku.
 Like normal proxy. Get ur request then post to twitter. Get the response back to u.
 
 * Step one: clone me
-	git clone git@github.com:cncolder/twithole.git 
+	* `git clone git@github.com:cncolder/twithole.git`
+
 * Step two: push me to heroku
-	git push heroku master
-* Step three: no step three. just use it. lol
+	* `git push heroku master`
+	
+* Step three: *no step three*. **just use it**. lol
 
 ## Thanks
 
