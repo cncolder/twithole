@@ -4,7 +4,6 @@ require 'rack/proxy'
 
 class TwitHole < Rack::Proxy
   def initialize(app)
-    @app = app
     super()
   end
   
@@ -26,7 +25,7 @@ class TwitHole < Rack::Proxy
 end
 
 # use Rack::ShowExceptions
-app = TwitHole.new(env)
+app = proc { |env| TwitHole.new(env) }
 
 run app
 
