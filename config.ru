@@ -140,8 +140,8 @@ module Rack
 end
 
 class TwitHole < Rack::Proxy
-  def initialize(env)
-    super()
+  def initialize(app)
+    @app = app
   end
   
   def rewrite_env(env)
