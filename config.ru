@@ -28,19 +28,13 @@ class TwitHole
       http.request(req)
     end
     
-    if res.is_a?(Net::HTTPRedirection)
-      headers = {}
-      res.each_header do |k,v|
-        headers[k] = k == 'location' ? v.gsub(uri.host, @req.host) : v
-      end
-      [ 200, {"Content-Type" => "text/html"}, [ headers.map { |k,v| "#{k} : #{v}" }.join('<br>') ] ]
-    else
-      headers = {}
-      res.each_header do |k,v|
-        headers[k] = v unless k.to_s =~ /cookie|content-length|transfer-encoding/i
-      end
-      [ res.code.to_i, headers, [ res.read_body.gsub(uri.host, @req.host) ] ]
+    headers = {}
+    res.each_header do |k,v|
+      # headers[k] = v unless k.to_s =~ /cookie|content-length|transfer-encoding/i
+      headers[k] = k == 'location' ? v.gsub(uri.host, @req.host) : v
     end
+    
+    [ res.code.to_i, headers, [ res.read_body.gsub(uri.host, @req.host) ] ]
   end
 end
 
