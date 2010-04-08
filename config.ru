@@ -30,8 +30,8 @@ class TwitHole
     
     headers = {}
     res.each_header do |k,v|
-      # headers[k] = v unless k.to_s =~ /cookie|content-length|transfer-encoding/i
-      headers[k] = k == 'location' ? v.gsub(uri.host, @req.host) : v
+      headers[k] = v unless k.to_s =~ /cookie|content-length|transfer-encoding/i
+      headers[k] = v.gsub(uri.host, @req.host) if k == 'location'
     end
     
     [ res.code.to_i, headers, [ res.read_body.gsub(uri.host, @req.host) ] ]
