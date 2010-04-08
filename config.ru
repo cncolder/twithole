@@ -4,7 +4,7 @@ require 'rack/proxy'
 
 class TwitHole < Rack::Proxy
   def initialize(app)
-    super()
+    @app = app
   end
   
   def rewrite_env(env)
@@ -18,15 +18,11 @@ class TwitHole < Rack::Proxy
     headers["X-Foo"] = "Bar"
     triplet
   end
-  
-  def [](i)
-    @triplet[i]
-  end
 end
 
 # use Rack::ShowExceptions
-app = proc { |env| TwitHole.new(env) }
-
+use TwitHole
+app = lambda { |env| [200, { 'Content-Type' => 'text/html' }, 'Hello World'] }
 run app
 
 # run proc{|env| TwitHole.new(env).result }
