@@ -55,7 +55,7 @@ class TwitHole
     twitter_headers['location'] = twitter_headers['location'].gsub(uri.host, user_request.host) if twitter_response.is_a?(Net::HTTPRedirection)
     
     # Log ur works. U can see this from '/admin/log' in ur browser.
-    self.class.log.unshift({:time => Time.now.strftime('%Y-%m-%d %H:%M:%S'), :action => request_method.upcase.ljust(7) + twitter_uri.path, :result => twitter_response.msg}) if twitter_uri.path !~ /favicon\.ico$/
+    self.class.log.unshift({:time => Time.now.strftime('%Y-%m-%d %H:%M:%S'), :action => request_method.upcase + ' ' + twitter_uri.path, :result => twitter_response.msg}) if twitter_uri.path !~ /favicon\.ico$/
     
     # Return result to u.
     [ twitter_response.code.to_i, twitter_headers, [ twitter_response.read_body.gsub(twitter_uri.host, user_request.host) ] ]
@@ -91,7 +91,7 @@ end
 map '/admin/log' do
   run lambda { |env|
     res = %{
-<table bordercolor=#eeeeee cellspacing=20>
+<table bordercolor=#eeeeee cellspacing=8>
 	#{TwitHole.log.map {|l| "<tr><td>#{l[:time]}</td><td>#{l[:action]}</td><td>#{l[:result]}</td></tr>"}}
 </table>}
     [ 200, { 'Content-Type' => 'text/html' }, [ res ] ]
