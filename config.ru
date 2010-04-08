@@ -55,7 +55,7 @@ class TwitHole
     twitter_headers['location'] = twitter_headers['location'].gsub(uri.host, user_request.host) if twitter_response.is_a?(Net::HTTPRedirection)
     
     # Log ur works. U can see this from '/admin/log' in ur browser.
-    self.class.log.unshift({:time => Time.now, :ip => user_request['HTTP_X_REAL_IP'], :method => request_method, :url => twitter_uri.path, :result => twitter_response.msg})
+    self.class.log.unshift({:time => Time.now, :ip => env['HTTP_X_REAL_IP'], :method => request_method, :url => twitter_uri.path, :result => twitter_response.msg})
     
     # Return result to u.
     [ twitter_response.code.to_i, twitter_headers, [ twitter_response.read_body.gsub(twitter_uri.host, user_request.host) ] ]
@@ -93,7 +93,7 @@ map '/admin/log' do
     res = %{
 <table border=1>
   <tr><th>Time</th><th>IP</th><th>Method</th><th>Url</th><th>Result</th></tr>
-	<tr>#{TwitHole.log.map {|l| "<td>#{l[:time]}</td><td>#{l[:ip]}</td><td>l#{l[:method]}</td><td>#{l[:url]}</td><td>#{l[:result]}</td>"}}</tr>
+	<tr>#{TwitHole.log.map {|l| "<td>#{l[:time]}</td><td>#{l[:ip]}</td><td>#{l[:method]}</td><td>#{l[:url]}</td><td>#{l[:result]}</td>"}}</tr>
 </table>}
     [ 200, { 'Content-Type' => 'text/html' }, [ res ] ]
   }
