@@ -34,7 +34,7 @@ class TwitHole
       headers[k] = v unless k.to_s =~ /cookie|content-length|transfer-encoding/i
     end
  
-    [ res.code.to_i, headers, [ res.read_body.gsub(user_req['HTTP_HOST'], 'uri.host') ] ]
+    [ res.code.to_i, headers, [ res.read_body.gsub(user_req.host, uri.host) ] ]
   end
 end
 
