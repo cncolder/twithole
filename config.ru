@@ -22,11 +22,9 @@ class TwitHole
     
     req['X-Forwarded-For'] = (@req['HTTP_X_FORWARDED_FOR'].to_s.split(/, +/) + [@req['REMOTE_ADDR']]).uniq.join(", ")
     required_headers = [ 'Authorization', 'User-Agent', 'X-Twitter-Client', 'X-Twitter-Client-URL', 'X-Twitter-Client-Version' ]
-    @req.env.each do |k,v| 
-      if k.gsub('_', '-') =~ %r{required_headers.join('|')}i
-        key = k.gsub(/^HTTP_/, '').split('_').map { |s| s.capitalize }.join('-')
-        req[key] = v
-      end
+    @req.env.each do |k,v|
+      key = k.gsub(/^HTTP_/, '').split('_').map { |s| s.capitalize }.join('-')
+      req[key] = v if required_headers.include?(key)
     end
  
     res = Net::HTTP.start(uri.host, uri.port) do |http|
