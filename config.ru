@@ -30,13 +30,14 @@ class TwitHole
     
     headers = {}
     res.each_header do |k,v|
-      headers[k] = v unless k.to_s =~ /cookie|content-length|transfer-encoding/i
-      headers[k] = v.gsub(uri.host, @req.host) if k == 'location'
-    end
+      headers[k] = v # unless k.to_s =~ /cookie|content-length|transfer-encoding/i
+    end  
+    headers['location'] = headers['location'].gsub(uri.host, @req.host) if headers['location']
     
     puts %{
 Started #{method} #{uri} for #{@req['REMOTE_ADDR']} at #{Time.now}
-  Finished #{res.code}
+  Headers #{headers}
+  Finished #{res.code} #{res.msg}
     }
     
     [ res.code.to_i, headers, [ res.read_body.gsub(uri.host, @req.host) ] ]
