@@ -4,13 +4,15 @@
 
 require 'net/http'
 
+# Twitter host address.
+TWITTER = URI('http://twitter.com')
+
+# Twitter require these headers.
+HEADERS = [ 'Authorization', 'User-Agent', 'X-Twitter-Client', 'X-Twitter-Client-Version' ]
+
+@log = []
+
 class TwitHole
-  # Twitter host address.
-  TWITTER = URI('http://twitter.com')
-  
-  # Twitter require these headers.
-  HEADERS = [ 'Authorization', 'User-Agent', 'X-Twitter-Client', 'X-Twitter-Client-Version' ]
-  
   def initialize(app)
     @app = app
   end
@@ -54,12 +56,9 @@ class TwitHole
     # If twitter return 3xx status code which means redirection. Change location to make u redirect to right address. Otherwise u will leave ur proxy site.
     twitter_headers['location'] = twitter_headers['location'].gsub(uri.host, user_request.host) if twitter_response.is_a?(Net::HTTPRedirection)
     
-    # Log ur works. U can see this by type 'heroku logs' in ur shell.
-    puts %{
-  Started #{request_method} #{twitter_uri} for #{user_request['HTTP_X_REAL_IP']} at #{Time.now}
-    Request #{twitter_request.each_header {}.map {|i| i.first + ':' + i.last.first}.join(' ')}
-    Finished #{twitter_response.code} #{twitter_response.msg}
-    }
+    # Log ur works. U can see this from '/admin/log' in ur browser.
+    @log.pop() if @log.size > 1000
+    @log.unshift({:time => Time.now, :ip => user_request['HTTP_X_REAL_IP'], :method => request_method, :url => twitter_uri.path, :result => twitter_response.msg})
     
     # Return result to u.
     [ twitter_response.code.to_i, twitter_headers, [ twitter_response.read_body.gsub(twitter_uri.host, user_request.host) ] ]
@@ -85,11 +84,14 @@ map '/admin/env' do
   }
 end
 
-# Visit this address u will see some info about ur request.
-map '/admin/req' do
+# Visit this address u will see log about ur site.
+map '/admin/log' do
   run lambda { |env|
-    req = Rack::Request.new(env)
-    res = req.methods.map { |m| "#{m} : #{req.send(m) rescue nil}" }.join('<br>')
+    res = %{
+<table border=1>
+  <tr><th>Time</th><th>IP</th><th>Method</th><th>Url</th><th>Result</th></tr>
+	<tr>#{@log.map {|l| "<td>#{l[:time]}</td><td>#{l[:ip]}</td><td>l#{l[:method]}</td><td>#{l[:url]}</td><td>#{l[:result]}</td>"}}</tr>
+</table>}
     [ 200, { 'Content-Type' => 'text/html' }, [ res ] ]
   }
 end
