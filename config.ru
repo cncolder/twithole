@@ -24,15 +24,15 @@ class TwitHole < Rack::Proxy
   end
 end
 
-use Rack::ShowExceptions
+# use Rack::ShowExceptions
 use TwitHole
 
 run proc{|env| [200, {"Content-Type" => "text/plain"}, ["Ha ha ha"]] }
 
-map '/env' do
-  run lambda { |env| [ 200, { 'Content-Type' => 'text/html' }, [ env.map { |k,v| "#{k} : #{v}" }.join('<br>') ] ] }
-end
-
-map '/log' do
-  run lambda { |env| [ 200, { 'Content-Type' => 'text/html' }, [ 'Thinking...' ] ] }
-end
+# map '/env' do
+#   run lambda { |env| [ 200, { 'Content-Type' => 'text/html' }, [ env.map { |k,v| "#{k} : #{v}" }.join('<br>') ] ] }
+# end
+# 
+# map '/log' do
+#   run lambda { |env| [ 200, { 'Content-Type' => 'text/html' }, [ 'Thinking...' ] ] }
+# end
