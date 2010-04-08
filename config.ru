@@ -22,7 +22,7 @@ class TwitHole
     
     req['X-Forwarded-For'] = (@req['HTTP_X_FORWARDED_FOR'].to_s.split(/, +/) + [@req['REMOTE_ADDR']]).uniq.join(", ")
     @req.env.each do |k,v| 
-      if k =~ /^HTTP_/ and k !~ /HEROKU/
+      if k =~ /^HTTP_/ and k !~ /HEROKU|HOST/
         key = k.gsub(/^HTTP_/, '').split('_').map { |s| s.capitalize }.join('-')
         req[key] = v
       end
@@ -40,8 +40,8 @@ class TwitHole
     
     puts %{
 Started #{method} #{uri} for #{@req['REMOTE_ADDR']} at #{Time.now}
-  Request #{req.each_header {}}
-  Response #{headers.map do |k,v| k + ':' + v end.join(' ')}
+  Request #{req.each_header {}.map {|i| i.first + ':' + i.last}.join(' ')}
+  Response #{headers.map {|k,v| k + ':' + v}.join(' ')}
   Finished #{res.code} #{res.msg}
     }
     
