@@ -1,9 +1,4 @@
-#############################################################################
-#--
-# Copyright (c) 2009-2010 Colder <cncolder@gmail.com>.
-#   Released under the MIT license.
-#++
-#############################################################################
+#\ -d -E development
 
 require 'rack/proxy'
 
@@ -31,7 +26,9 @@ class TwitHole < Rack::Proxy
 end
 
 # use Rack::ShowExceptions
-use TwitHole
+app = TwitHole.new(env)
+
+run app
 
 # run proc{|env| TwitHole.new(env).result }
 
