@@ -23,7 +23,7 @@ class TwitHole
     req['X-Forwarded-For'] = (@req['HTTP_X_FORWARDED_FOR'].to_s.split(/, +/) + [@req['REMOTE_ADDR']]).uniq.join(", ")
     required_headers = [ 'Authorization', 'User-Agent', 'X-Twitter-Client', 'X-Twitter-Client-URL', 'X-Twitter-Client-Version' ]
     @req.env.each do |k,v| 
-      if required_headers.include?(k.gsub(/^HTTP_/, '').gsub('_', '-'))
+      if k.gsub('_', '-') =~ %r{required_headers.join('|')}
         key = k.gsub(/^HTTP_/, '').split('_').map { |s| s.capitalize }.join('-')
         req[key] = v
       end
