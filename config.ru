@@ -140,6 +140,10 @@ module Rack
 end
 
 class TwitHole < Rack::Proxy
+  def initialize(env)
+    super
+  end
+  
   def rewrite_env(env)
     env["HTTP_HOST"] = "twitter.com"
     env
