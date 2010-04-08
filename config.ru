@@ -38,7 +38,8 @@ class TwitHole
 end
 
 use TwitHole
-run Rack::Lobster.new
+
+run lambda { |env| [200, {"Content-Type" => "text/plain"}, ["Hello Twitter!"] ] }
 
 # class TwitHole < Rack::Proxy
 #   def initialize(app)
