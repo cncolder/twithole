@@ -8,11 +8,6 @@
 require 'rack/proxy'
 
 class TwitHole < Rack::Proxy
-  def initialize(env)
-    @env = env
-    super()
-  end
-  
   def rewrite_env(env)
     env["HTTP_HOST"] = "twitter.com"
     env
@@ -24,16 +19,12 @@ class TwitHole < Rack::Proxy
     headers["X-Foo"] = "Bar"
     triplet
   end
-  
-  def result
-    @triplet
-  end
 end
 
 # use Rack::ShowExceptions
-# use TwitHole
+use TwitHole
 
-run proc{|env| TwitHole.new(env).result }
+# run proc{|env| TwitHole.new(env).result }
 
 # map '/env' do
 #   run lambda { |env| [ 200, { 'Content-Type' => 'text/html' }, [ env.map { |k,v| "#{k} : #{v}" }.join('<br>') ] ] }
