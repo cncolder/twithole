@@ -21,7 +21,7 @@ class TwitHole
       req.content_type = @req.content_type
     end
     
-    req['X-Forwarded-For'] = (@req['HTTP_X_FORWARDED_FOR'].to_s.split(/, +/) + [req['REMOTE_ADDR']]).uniq.join(", ")
+    req['X-Forwarded-For'] = (@req['HTTP_X_FORWARDED_FOR'].to_s.split(/, +/) + [@req['REMOTE_ADDR']]).uniq.join(", ")
     %w{Accept-Encoding Authorization Referer User-Agent X-Twitter-Client X-Twitter-Client-URL X-Twitter-Client-Version}.each { |h| req[h] = @req["HTTP_#{h.gsub('-', '_').upcase}"] }
  
     res = Net::HTTP.start(uri.host, uri.port) do |http|
@@ -35,7 +35,7 @@ class TwitHole
     end
     
     puts %{
-Started #{method} #{uri} for #{req['REMOTE_ADDR']} at #{Time.now}
+Started #{method} #{uri} for #{@req['REMOTE_ADDR']} at #{Time.now}
   Finished #{res.code}
     }
     
