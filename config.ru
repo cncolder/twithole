@@ -21,7 +21,7 @@ class TwitHole
     end
     
     req['X-Forwarded-For'] = (@req['HTTP_X_FORWARDED_FOR'].to_s.split(/, +/) + [@req['REMOTE_ADDR']]).uniq.join(", ")
-    @req.each do |k,v| 
+    @req.env.each do |k,v| 
       if k =~ /^HTTP_/
         key = k.gsub(/^HTTP_/, '').split('_').map(&capitalize).join('-')
         req[key] = v
