@@ -40,7 +40,7 @@ class TwitHole
     
     puts %{
 Started #{method} #{uri} for #{@req['REMOTE_ADDR']} at #{Time.now}
-  Request #{env.map {|k,v| k + ':' + v rescue ''}.join(' ')}
+  Request #{req.env.map {|k,v| k + ':' + v rescue ''}.join(' ')}
   Response #{headers.map {|k,v| k + ':' + v}.join(' ')}
   Finished #{res.code} #{res.msg}
     }
