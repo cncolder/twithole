@@ -33,6 +33,8 @@ class TwitHole
     res.each_header do |k,v|
       headers[k] = v unless k.to_s =~ /cookie|content-length|transfer-encoding/i
     end
+    
+    res['location'].gsub!(@req.host, uri.host) if res == Net::HTTPRedirection
  
     [ res.code.to_i, headers, [ res.read_body.gsub(@req.host, uri.host) ] ]
   end
