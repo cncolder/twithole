@@ -25,7 +25,7 @@ class TwitHole < Rack::Proxy
 end
 
 # use Rack::ShowExceptions
-use TwitHole
+# use TwitHole
 
 run proc{|env| [200, {"Content-Type" => "text/plain"}, ["Ha ha ha"]] }
 
