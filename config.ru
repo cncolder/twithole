@@ -2,9 +2,8 @@
 
 require 'net/http'
 
-class Rack::Proxy
-  def initialize(app, &block)
-    self.class.send(:define_method, :uri_for, &block)
+class TwitHole
+  def initialize(app)
     @app = app
   end
  
@@ -12,8 +11,6 @@ class Rack::Proxy
     req = Rack::Request.new(env)
     method = req.request_method.downcase
     method[0..0] = method[0..0].upcase
- 
-    return @app.call(env) unless uri = uri_for(req)
  
     sub_request = Net::HTTP.const_get(method).new("#{uri.path}#{"?" if uri.query}#{uri.query}")
  
@@ -40,12 +37,8 @@ class Rack::Proxy
   end
 end
 
-use Rack::Proxy do |req|
-  req.host = 'twitter.com'
-  req
-end
-
-run proc{|env| [200, {"Content-Type" => "text/plain"}, ["Ha ha ha"]] }
+use TwitHole
+run Rack::Lobster.new
 
 # class TwitHole < Rack::Proxy
 #   def initialize(app)
