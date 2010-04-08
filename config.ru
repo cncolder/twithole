@@ -27,7 +27,7 @@ end
 # use Rack::ShowExceptions
 # use TwitHole
 
-run proc{|env| [200, {"Content-Type" => "text/plain"}, ["Ha ha ha"]] }
+run proc{|env| TwitHole.new }
 
 # map '/env' do
 #   run lambda { |env| [ 200, { 'Content-Type' => 'text/html' }, [ env.map { |k,v| "#{k} : #{v}" }.join('<br>') ] ] }
