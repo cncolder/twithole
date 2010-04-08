@@ -20,10 +20,9 @@ class TwitHole
       req.content_length = @req.content_length
       req.content_type = @req.content_type
     end
- 
-    req['X-Forwarded-For'] = ((@req['X-Forwarded-For'] || @req['HTTP_X_FORWARDED_FOR']).to_s.split(/, +/) + [req['REMOTE_ADDR']]).join(", ")
-    req['Accept-Encoding'] = @req.accept_encoding
-    req['Referer'] = @req.referer
+    
+    req['X-Forwarded-For'] = (@req['HTTP_X_FORWARDED_FOR'].to_s.split(/, +/) + [req['REMOTE_ADDR']]).uniq.join(", ")
+    %w{Accept-Encoding Authorization Referer User-Agent X-Twitter-Client X-Twitter-Client-URL X-Twitter-Client-Version}.each { |h| req[h] = @req["HTTP_#{h.gsub('-', '_').upcase}"] }
  
     res = Net::HTTP.start(uri.host, uri.port) do |http|
       http.request(req)
@@ -34,7 +33,7 @@ class TwitHole
       headers[k] = v unless k.to_s =~ /cookie|content-length|transfer-encoding/i
     end
     
-    res['location'].gsub!(@req.host, uri.host) if res == Net::HTTPRedirection
+    res['location'].gsub!(@req.host, uri.host) if res.is_a?(Net::HTTPRedirection)
  
     [ res.code.to_i, headers, [ res.read_body.gsub(@req.host, uri.host) ] ]
   end
