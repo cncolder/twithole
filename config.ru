@@ -152,9 +152,10 @@ class TwitHole < Rack::Proxy
   end
 end
 
-map '/' do
-  run lambda { |env| r = TwitHole.new; [ r.status, r.headers, r.body ] }
-end
+use Rack::ShowExceptions
+use TwitHole
+
+run proc{|env| [200, {"Content-Type" => "text/plain"}, ["Ha ha ha"]] }
 
 map '/env' do
   run lambda { |env| [ 200, { 'Content-Type' => 'text/html' }, [ env.map { |k,v| "#{k} : #{v}" }.join('<br>') ] ] }
