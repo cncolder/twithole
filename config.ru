@@ -1,60 +1,84 @@
-#\ -d -E development
+# =====================================================
+# = Twitter hole 0.1   Colder <cncolder.at.gmail.com> =
+# =====================================================
 
 require 'net/http'
 
 class TwitHole
+  # Twitter host address.
+  TWITTER = URI('http://twitter.com').freeze
+  
+  # Twitter require these headers.
+  HEADERS = [ 'Authorization', 'User-Agent', 'X-Twitter-Client', 'X-Twitter-Client-Version' ].freeze
+  
   def initialize(app)
     @app = app
   end
  
   def call(env)
-    @req = Rack::Request.new(env)
-    method = @req.request_method.capitalize
+    user_request = Rack::Request.new(env)
     
-    uri = URI('http://twitter.com').merge(@req.fullpath)
-    req = Net::HTTP.const_get(method).new(uri.to_s)
+    # Get user's browser http verb. eg. 'Get', 'Post'.
+    request_method = user_request.request_method.capitalize
+    
+    # Build request full path.
+    twitter_uri = TWITTER.merge(user_request.fullpath)
+    
+    # Use http verb to build http instance. But now u need get and post only.
+    twitter_request = Net::HTTP.const_get(request_method).new(twitter_uri.to_s)
  
-    if req.request_body_permitted? and @req.body
-      req.body_stream = @req.body
-      req.content_length = @req.content_length
-      req.content_type = @req.content_type
+    # If it's post verb. Read post data.
+    if twitter_request.request_body_permitted? and user_request.body
+      twitter_request.body_stream = user_request.body
+      twitter_request.content_length = user_request.content_length
+      twitter_request.content_type = user_request.content_type
     end
     
-    req['X-Forwarded-For'] = (@req['HTTP_X_FORWARDED_FOR'].to_s.split(/, +/) + [@req['REMOTE_ADDR']]).uniq.join(", ")
-    required_headers = [ 'Authorization', 'User-Agent', 'X-Twitter-Client', 'X-Twitter-Client-URL', 'X-Twitter-Client-Version' ]
-    @req.env.each do |k,v|
+    # Fetch user request. Filter out required headers.
+    user_request.env.each do |k,v|
       key = k.gsub(/^HTTP_/, '').split('_').map { |s| s.capitalize }.join('-')
-      req[key] = v if required_headers.include?(key)
+      twitter_request[key] = v if REQUIRED_HEADERS.include?(key)
     end
  
-    res = Net::HTTP.start(uri.host, uri.port) do |http|
+    # Send request then wait response from twitter.
+    twitter_response = Net::HTTP.start(uri.host, uri.port) do |http|
       http.request(req)
     end
     
-    headers = {}
-    res.each_header do |k,v|
-      headers[k] = v # unless k.to_s =~ /cookie|content-length|transfer-encoding/i
-    end  
-    headers['location'] = headers['location'].gsub(uri.host, @req.host) if headers['location']
+    # Get twitter response headers. Maybe the best idea is filter it and make it simple.
+    twitter_headers = {}
+    twitter_response.each_header do |k,v|
+      twitter_headers[k] = v
+    end
     
+    # If twitter return 3xx status code which means redirection. Change location to make u redirect to right address. Otherwise u will leave ur proxy site.
+    twitter_headers['location'] = twitter_headers['location'].gsub(uri.host, user_request.host) if twitter_response.is_a?(Net::HTTPRedirection)
+    
+    # Log ur works. U can see this by type 'heroku logs' in ur shell.
     puts %{
-Started #{method} #{uri} for #{@req['REMOTE_ADDR']} at #{Time.now}
-  Request #{req.each_header {}.map {|i| i.first + ':' + i.last.first}.join(' ')}
-  Response #{headers.map {|k,v| k + ':' + v}.join(' ')}
-  Finished #{res.code} #{res.msg}
+  Started #{request_method} #{twitter_uri} for #{user_request['HTTP_X_REAL_IP']} at #{Time.now}
+    Request #{req.each_header {}.map {|i| i.first + ':' + i.last.first}.join(' ')}
+    Response #{headers.map {|k,v| k + ':' + v}.join(' ')}
+    Finished #{twitter_response.code} #{twitter_response.msg}
     }
     
-    [ res.code.to_i, headers, [ res.read_body.gsub(uri.host, @req.host) ] ]
+    # Return result to u.
+    [ twitter_response.code.to_i, headers, [ twitter_response.read_body.gsub(uri.host, user_request.host) ] ]
   end
 end
 
+# Handle the root path can catch all request.
 map '/' do
+  # Use twit hole middleware.
   use TwitHole
+  
+  # This is a dummy line like u see. The middleware has do with all things. So this line will not work. But rack need it.
   run lambda { |env|
     [ 200, {"Content-Type" => "text/plain"}, [ "Hello Twitter!" ] ]
   }
 end
 
+# Visit this address u will see the server environments.
 map '/admin/env' do
   run lambda { |env|
     res = env.map { |k,v| "#{k} : #{v}" }.join('<br>')
@@ -62,6 +86,7 @@ map '/admin/env' do
   }
 end
 
+# Visit this address u will see some info about ur request.
 map '/admin/req' do
   run lambda { |env|
     req = Rack::Request.new(env)
