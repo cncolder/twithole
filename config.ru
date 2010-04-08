@@ -6,10 +6,10 @@ require 'net/http'
 
 class TwitHole
   # Twitter host address.
-  TWITTER = URI('http://twitter.com').freeze
+  TWITTER = URI('http://twitter.com')
   
   # Twitter require these headers.
-  HEADERS = [ 'Authorization', 'User-Agent', 'X-Twitter-Client', 'X-Twitter-Client-Version' ].freeze
+  HEADERS = [ 'Authorization', 'User-Agent', 'X-Twitter-Client', 'X-Twitter-Client-Version' ]
   
   def initialize(app)
     @app = app
@@ -37,11 +37,11 @@ class TwitHole
     # Fetch user request. Filter out required headers.
     user_request.env.each do |k,v|
       key = k.gsub(/^HTTP_/, '').split('_').map { |s| s.capitalize }.join('-')
-      twitter_request[key] = v if REQUIRED_HEADERS.include?(key)
+      twitter_request[key] = v if HEADERS.include?(key)
     end
  
     # Send request then wait response from twitter.
-    twitter_response = Net::HTTP.start(uri.host, uri.port) do |http|
+    twitter_response = Net::HTTP.start(twitter_uri.host, twitter_uri.port) do |http|
       http.request(req)
     end
     
@@ -58,7 +58,6 @@ class TwitHole
     puts %{
   Started #{request_method} #{twitter_uri} for #{user_request['HTTP_X_REAL_IP']} at #{Time.now}
     Request #{req.each_header {}.map {|i| i.first + ':' + i.last.first}.join(' ')}
-    Response #{headers.map {|k,v| k + ':' + v}.join(' ')}
     Finished #{twitter_response.code} #{twitter_response.msg}
     }
     
