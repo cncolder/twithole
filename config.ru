@@ -141,7 +141,7 @@ end
 
 class TwitHole < Rack::Proxy
   def initialize(env)
-    super
+    super()
   end
   
   def rewrite_env(env)
