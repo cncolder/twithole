@@ -40,34 +40,22 @@ end
 
 map '/' do
   use TwitHole
-  run lambda { |env| [200, {"Content-Type" => "text/plain"}, ["Hello Twitter!"] ] }
+  run lambda { |env|
+    [ 200, {"Content-Type" => "text/plain"}, [ "Hello Twitter!" ] ]
+  }
 end
 
 map '/admin/env' do
-  run lambda { |env| [ 200, { 'Content-Type' => 'text/html' }, [ env.map { |k,v| "#{k} : #{v}" }.join('<br>') ] ] }
+  run lambda { |env|
+    res = env.map { |k,v| "#{k} : #{v}" }.join('<br>')
+    [ 200, { 'Content-Type' => 'text/html' }, [ res ] ]
+  }
 end
 
-# class TwitHole < Rack::Proxy
-#   def initialize(app)
-#     @app = app
-#   end
-#   
-#   def rewrite_env(env)
-#     env["HTTP_HOST"] = "twitter.com"
-#     env
-#   end
-# 
-#   def rewrite_response(triplet)
-#     @triplet = triplet
-#     status, headers, body = triplet
-#     headers["X-Foo"] = "Bar"
-#     triplet
-#   end
-# end
-
-# run proc{|env| TwitHole.new(env).result }
-
-# 
-# map '/log' do
-#   run lambda { |env| [ 200, { 'Content-Type' => 'text/html' }, [ 'Thinking...' ] ] }
-# end
+map '/admin/req' do
+  run lambda { |env|
+    req = Rack::Request.new(env)
+    res = req.methods.map { |m| "#{m} : #{req.send(m) rescue nil}" }.join('<br>')
+    [ 200, { 'Content-Type' => 'text/html' }, [ res ] ]
+  }
+end
