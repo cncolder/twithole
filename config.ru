@@ -24,6 +24,10 @@ class TwitHole < Rack::Proxy
     headers["X-Foo"] = "Bar"
     triplet
   end
+  
+  def [](i)
+    @triplet[i]
+  end
 end
 
 # use Rack::ShowExceptions
