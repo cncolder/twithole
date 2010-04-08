@@ -34,26 +34,17 @@ class TwitHole
       headers[k] = v unless k.to_s =~ /cookie|content-length|transfer-encoding/i
     end
  
-    [res.code.to_i, headers, [res.read_body]]
+    [ res.code.to_i, headers, [ res.read_body.gsub(user_req['HTTP_HOST'], 'uri.host') ] ]
   end
 end
 
-use TwitHole
-
 map '/' do
+  use TwitHole
   run lambda { |env| [200, {"Content-Type" => "text/plain"}, ["Hello Twitter!"] ] }
 end
 
-map '/env' do
+map '/admin/env' do
   run lambda { |env| [ 200, { 'Content-Type' => 'text/html' }, [ env.map { |k,v| "#{k} : #{v}" }.join('<br>') ] ] }
-end
-
-map '/test' do
-  run proc { |env|
-    req = Rack::Request.new(env)
-    result = req.methods.map { |m| "#{m} : #{req.send(m) rescue nil}" }.join('<br>')
-    [ 200, { 'Content-Type' => 'text/html' }, [ result ] ]
-  }
 end
 
 # class TwitHole < Rack::Proxy
