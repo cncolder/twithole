@@ -153,7 +153,7 @@ class TwitHole < Rack::Proxy
 end
 
 map '/' do
-  use TwitHole
+  run lambda { |env| TwitHole.new }
 end
 
 map '/env' do
