@@ -57,12 +57,12 @@ class TwitHole
     # Log ur works. U can see this by type 'heroku logs' in ur shell.
     puts %{
   Started #{request_method} #{twitter_uri} for #{user_request['HTTP_X_REAL_IP']} at #{Time.now}
-    Request #{req.each_header {}.map {|i| i.first + ':' + i.last.first}.join(' ')}
+    Request #{twitter_request.each_header {}.map {|i| i.first + ':' + i.last.first}.join(' ')}
     Finished #{twitter_response.code} #{twitter_response.msg}
     }
     
     # Return result to u.
-    [ twitter_response.code.to_i, headers, [ twitter_response.read_body.gsub(uri.host, user_request.host) ] ]
+    [ twitter_response.code.to_i, headers, [ twitter_response.read_body.gsub(twitter_uri.host, user_request.host) ] ]
   end
 end
 
