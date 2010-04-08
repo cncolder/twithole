@@ -18,7 +18,7 @@ Like normal proxy. Get ur request then post to twitter. Get the response back to
 
 ## Thanks
 
-![Heroku](http://heroku.com)
-![Net::HTTP](http://ruby-doc.org/stdlib/libdoc/net/http/rdoc/index.html)
-![Rack::Proxy](http://github.com/ncr/rack-proxy)
-![BirdNest](http://birdnest.googlecode.com)
+[Heroku](http://heroku.com)
+[Net::HTTP](http://ruby-doc.org/stdlib/libdoc/net/http/rdoc/index.html)
+[Rack::Proxy](http://github.com/ncr/rack-proxy)
+[BirdNest](http://birdnest.googlecode.com)
