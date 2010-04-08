@@ -8,6 +8,11 @@
 require 'rack/proxy'
 
 class TwitHole < Rack::Proxy
+  def initialize(app)
+    @app = app
+    super()
+  end
+  
   def rewrite_env(env)
     env["HTTP_HOST"] = "twitter.com"
     env
