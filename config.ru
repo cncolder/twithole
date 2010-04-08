@@ -33,9 +33,12 @@ class TwitHole
       headers[k] = v unless k.to_s =~ /cookie|content-length|transfer-encoding/i
     end
     
-    res['location'].gsub!(@req.host, uri.host) if res.is_a?(Net::HTTPRedirection)
- 
-    [ res.code.to_i, headers, [ res.read_body.gsub(@req.host, uri.host) ] ]
+    # res['location'].gsub!(@req.host, uri.host) if res.is_a?(Net::HTTPRedirection)
+    if res.is_a?(Net::HTTPRedirection)
+      [ 200, {"Content-Type" => "text/html"}, [ res.methods.map { |m| "#{m} : #{req.send(m) rescue nil}" }.join('<br>') ] ]
+    else
+      [ res.code.to_i, headers, [ res.read_body.gsub(@req.host, uri.host) ] ]
+    end
   end
 end
 
