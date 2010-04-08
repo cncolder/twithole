@@ -8,22 +8,22 @@ class TwitHole
   end
  
   def call(env)
-    user_req = Rack::Request.new(env)
-    method = user_req.request_method.downcase
+    @req = Rack::Request.new(env)
+    method = @req.request_method.downcase
     method[0..0] = method[0..0].upcase
     
-    uri = URI('http://twitter.com').merge(user_req.fullpath)
+    uri = URI('http://twitter.com').merge(@req.fullpath)
     req = Net::HTTP.const_get(method).new(uri.to_s)
  
-    if req.request_body_permitted? and user_req.body
-      req.body_stream = user_req.body
-      req.content_length = user_req.content_length
-      req.content_type = user_req.content_type
+    if req.request_body_permitted? and @req.body
+      req.body_stream = @req.body
+      req.content_length = @req.content_length
+      req.content_type = @req.content_type
     end
  
-    req["X-Forwarded-For"] = (user_req["X-Forwarded-For"].to_s.split(/, +/) + [req['REMOTE_ADDR']]).join(", ")
-    req["Accept-Encoding"] = user_req.accept_encoding
-    req["Referer"] = user_req.referer
+    req['X-Forwarded-For'] = ((@req['X-Forwarded-For'] || @req['HTTP_X_FORWARDED_FOR']).to_s.split(/, +/) + [req['REMOTE_ADDR']]).join(", ")
+    req['Accept-Encoding'] = @req.accept_encoding
+    req['Referer'] = @req.referer
  
     res = Net::HTTP.start(uri.host, uri.port) do |http|
       http.request(req)
@@ -34,7 +34,7 @@ class TwitHole
       headers[k] = v unless k.to_s =~ /cookie|content-length|transfer-encoding/i
     end
  
-    [ res.code.to_i, headers, [ res.read_body.gsub(user_req.host, uri.host) ] ]
+    [ res.code.to_i, headers, [ res.read_body.gsub(@req.host, uri.host) ] ]
   end
 end
 
