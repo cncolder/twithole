@@ -32,7 +32,7 @@ class TwitHole
       http.request(req)
     end
     
-    headers = res.each_header
+    headers = {}
     res.each_header do |k,v|
       headers[k] = v # unless k.to_s =~ /cookie|content-length|transfer-encoding/i
     end  
@@ -40,7 +40,7 @@ class TwitHole
     
     puts %{
 Started #{method} #{uri} for #{@req['REMOTE_ADDR']} at #{Time.now}
-  Request #{req.each_header do |k,v| nil end}
+  Request #{req.each_header {}}
   Response #{headers.map do |k,v| k + ':' + v end.join(' ')}
   Finished #{res.code} #{res.msg}
     }
