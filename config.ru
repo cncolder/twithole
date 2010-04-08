@@ -34,6 +34,11 @@ class TwitHole
       headers[k] = v.gsub(uri.host, @req.host) if k == 'location'
     end
     
+    puts %{
+Started #{method} #{uri} for #{req['REMOTE_ADDR']} at #{Time.now}
+  Finished #{res.code}
+    }
+    
     [ res.code.to_i, headers, [ res.read_body.gsub(uri.host, @req.host) ] ]
   end
 end
