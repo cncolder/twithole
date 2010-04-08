@@ -8,38 +8,53 @@ class TwitHole
   end
  
   def call(env)
-    req = Rack::Request.new(env)
-    method = req.request_method.downcase
+    user_req = Rack::Request.new(env)
+    method = user_req.request_method.downcase
     method[0..0] = method[0..0].upcase
+    
+    uri = URI('http://twitter.com').merge(user_req.fullpath)
+    req = Net::HTTP.const_get(method).new(uri.to_s)
  
-    sub_request = Net::HTTP.const_get(method).new("#{uri.path}#{"?" if uri.query}#{uri.query}")
- 
-    if sub_request.request_body_permitted? and req.body
-      sub_request.body_stream = req.body
-      sub_request.content_length = req.content_length
-      sub_request.content_type = req.content_type
+    if req.request_body_permitted? and user_req.body
+      req.body_stream = user_req.body
+      req.content_length = user_req.content_length
+      req.content_type = user_req.content_type
     end
  
-    sub_request["X-Forwarded-For"] = (req.env["X-Forwarded-For"].to_s.split(/, +/) + [req.env['REMOTE_ADDR']]).join(", ")
-    sub_request["Accept-Encoding"] = req.accept_encoding
-    sub_request["Referer"] = req.referer
+    req["X-Forwarded-For"] = (user_req["X-Forwarded-For"].to_s.split(/, +/) + [req['REMOTE_ADDR']]).join(", ")
+    req["Accept-Encoding"] = user_req.accept_encoding
+    req["Referer"] = user_req.referer
  
-    sub_response = Net::HTTP.start(uri.host, uri.port) do |http|
-      http.request(sub_request)
+    res = Net::HTTP.start(uri.host, uri.port) do |http|
+      http.request(req)
     end
  
     headers = {}
-    sub_response.each_header do |k,v|
+    res.each_header do |k,v|
       headers[k] = v unless k.to_s =~ /cookie|content-length|transfer-encoding/i
     end
  
-    [sub_response.code.to_i, headers, [sub_response.read_body]]
+    [res.code.to_i, headers, [res.read_body]]
   end
 end
 
 use TwitHole
 
-run lambda { |env| [200, {"Content-Type" => "text/plain"}, ["Hello Twitter!"] ] }
+map '/' do
+  run lambda { |env| [200, {"Content-Type" => "text/plain"}, ["Hello Twitter!"] ] }
+end
+
+map '/env' do
+  run lambda { |env| [ 200, { 'Content-Type' => 'text/html' }, [ env.map { |k,v| "#{k} : #{v}" }.join('<br>') ] ] }
+end
+
+map '/test' do
+  run proc { |env|
+    req = Rack::Request.new(env)
+    result = req.methods.map { |m| "#{m} : #{req.send(m) rescue nil}" }.join('<br>')
+    [ 200, { 'Content-Type' => 'text/html' }, [ result ] ]
+  }
+end
 
 # class TwitHole < Rack::Proxy
 #   def initialize(app)
@@ -61,9 +76,6 @@ run lambda { |env| [200, {"Content-Type" => "text/plain"}, ["Hello Twitter!"] ] 
 
 # run proc{|env| TwitHole.new(env).result }
 
-# map '/env' do
-#   run lambda { |env| [ 200, { 'Content-Type' => 'text/html' }, [ env.map { |k,v| "#{k} : #{v}" }.join('<br>') ] ] }
-# end
 # 
 # map '/log' do
 #   run lambda { |env| [ 200, { 'Content-Type' => 'text/html' }, [ 'Thinking...' ] ] }
