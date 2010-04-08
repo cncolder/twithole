@@ -40,8 +40,8 @@ class TwitHole
     
     puts %{
 Started #{method} #{uri} for #{@req['REMOTE_ADDR']} at #{Time.now}
-  Request #{hs = {}; req.each_header {|k,v| hs[k] = v}; hs}
-  Response #{headers.map {|k,v| k + ':' + v}.join(' ')}
+  Request #{req.each_header do |k,v| nil end}
+  Response #{headers.map do |k,v| k + ':' + v end.join(' ')}
   Finished #{res.code} #{res.msg}
     }
     
